@@ -1,3 +1,4 @@
 streamlit
 pandas
+gspread
 starlette<0.38.0
