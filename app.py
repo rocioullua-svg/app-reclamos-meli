@@ -23,7 +23,7 @@ with st.form("formulario_reclamos"):
         
     with col2:
         motivo = st.text_input("Motivo exacto:")
-        responsabilidad = st.selectbox("Culpa de:", ["Vendedor", "Mercado Libre / Correo", "Comprador"])
+        responsabilidad = st.selectbox("Culpa de:", ["Error de gestion", "Mercado Libre / Correo", "Comprador", "Deposito (error despacho)", "Falla de producto" )
         estado = st.selectbox("Estado:", ["Vence hoy", "Próximo por atender", "Pendiente del comprador", "Resuelto"])
         
     # El botón para enviar
