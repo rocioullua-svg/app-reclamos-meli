@@ -67,7 +67,7 @@ if opcion == "📝 Cargar Reclamo":
             
         with col2:
             motivo = st.text_input("Motivo exacto:")
-            responsabilidad = st.selectbox("Culpa de:", ["Vendedor", "Mercado Libre / Correo", "Comprador"])
+            responsabilidad = st.selectbox("Culpa de:", ["Error de Gestion", "Correo", "Comprador", "Error de despacho (Deposito)", "Falla de producto"])
             estado = st.selectbox("Estado:", ["Vence hoy", "Próximo por atender", "Pendiente del comprador", "Resuelto"])
             
         submit = st.form_submit_button("Guardar Reclamo")
