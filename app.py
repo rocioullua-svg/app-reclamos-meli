@@ -21,6 +21,9 @@ st.markdown("""
         background-color: #2d3277;
         color: #ffe600;
     }
+    .stCheckbox label {
+        font-size: 15px !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -34,7 +37,6 @@ def conectar_sheets():
     hoja_principal = planilla.sheet1
     
     # Intentamos conectar a una pestaña específica para los envíos erróneos
-    # Si no existe, usamos la hoja principal por defecto.
     try:
         hoja_envios = planilla.worksheet("Envios_Erroneos")
     except:
@@ -53,18 +55,127 @@ hoy = date.today().strftime("%Y-%m-%d")
 # ==========================================
 st.sidebar.title("⚙️ Menú Principal")
 
+# Nueva opción de Agenda sumada al menú
 opcion = st.sidebar.radio(
     "Navegación:",
-    ["📄 Cargar Reclamo", "📦 Cargar Envío Erróneo", "📊 Resumen Diario", "🗂️ Historial Completo"]
+    [
+        "🗓️ Agenda de Tareas",
+        "📄 Cargar Reclamo", 
+        "📦 Cargar Envío Erróneo", 
+        "📊 Resumen Diario", 
+        "🗂️ Historial Completo"
+    ]
 )
 
 st.sidebar.divider()
 st.sidebar.caption("Aplicación conectada a Google Sheets")
 
 # ==========================================
-# --- VISTA 1: CARGAR RECLAMO ---
+# --- VISTA 1: AGENDA DE TAREAS ---
 # ==========================================
-if opcion == "📄 Cargar Reclamo":
+if opcion == "🗓️ Agenda de Tareas":
+    st.title("🗓️ Agenda Semanal de Tareas")
+    st.markdown("Organización de turnos y responsabilidades de Atención al Cliente.")
+    
+    # Estructura de la agenda extraída del Excel
+    agenda = {
+        "Lunes": {
+            "Gonzalo": {
+                "09:00 - 13:30": ["Preguntas", "Postventa", "Envios retiros depo", "Cambios cargados en YiQi", "Pendientes Guardia"],
+                "13:30 - 18:00": ["Reclamos", "Gmail", "NC Fravega (MAIL)", "Liveconnect/agent"]
+            },
+            "Lucas": {
+                "09:00 - 13:30": ["Reclamos", "Gmail", "NC Fravega (MAIL)", "Liveconnect/agent", "Retiros Flexit"],
+                "13:30 - 18:00": ["Preguntas", "Postventa", "Envios retiros depo", "Pendientes Guardia"]
+            }
+        },
+        "Martes": {
+            "Gonzalo": {
+                "09:00 - 13:30": ["Reclamos", "Gmail", "NC Fravega (MAIL)", "Liveconnect/agent", "Retiros Flexit"],
+                "13:30 - 18:00": ["Preguntas", "Postventa", "Cierre caja Pos"]
+            },
+            "Lucas": {
+                "09:00 - 13:30": ["Preguntas", "Postventa", "Envios retiros depo", "Cambios cargados en YiQi", "Pendientes Guardia"],
+                "13:30 - 18:00": ["Reclamos", "Gmail", "NC Fravega (MAIL)", "Liveconnect/agent"]
+            }
+        },
+        "Miércoles": {
+            "Gonzalo": {
+                "09:00 - 13:30": ["Preguntas", "Postventa", "Envios retiros depo", "Cambios cargados en YiQi", "Pendientes Guardia"],
+                "13:30 - 18:00": ["Reclamos", "Gmail", "NC Fravega (MAIL)", "Liveconnect/agent"]
+            },
+            "Lucas": {
+                "09:00 - 13:30": ["Reclamos", "Gmail", "NC Fravega (MAIL)", "Liveconnect/agent", "Retiros Flexit"],
+                "13:30 - 18:00": ["Preguntas", "Postventa", "Envios retiros depo", "Pendientes Guardia"]
+            }
+        },
+        "Jueves": {
+            "Gonzalo": {
+                "09:00 - 13:30": ["Reclamos", "Gmail", "NC Fravega (MAIL)", "Liveconnect/agent", "Retiros Flexit"],
+                "13:30 - 18:00": ["Preguntas", "Postventa", "Envios retiros depo", "Cierre caja Pos"]
+            },
+            "Lucas": {
+                "09:00 - 13:30": ["Preguntas", "Postventa", "Envios retiros depo", "Cambios cargados en YiQi", "Pendientes Guardia"],
+                "13:30 - 18:00": ["Reclamos", "Gmail", "NC Fravega (MAIL)", "Liveconnect/agent"]
+            }
+        },
+        "Viernes": {
+            "Gonzalo": {
+                "09:00 - 13:30": ["Preguntas", "Postventa", "Envios retiros depo", "Cambios cargados en YiQi", "Pendientes Guardia"],
+                "13:30 - 18:00": ["Reclamos", "Gmail", "NC Fravega (MAIL)", "Liveconnect/agent"]
+            },
+            "Lucas": {
+                "09:00 - 13:30": ["Reclamos", "Gmail", "NC Fravega (MAIL)", "Liveconnect/agent", "Retiros Flexit"],
+                "13:30 - 18:00": ["Preguntas", "Postventa", "Envios retiros depo", "Pendientes Guardia"]
+            }
+        }
+    }
+
+    # Crear pestañas para los días de la semana
+    dias = list(agenda.keys())
+    tabs = st.tabs(dias)
+
+    # Llenar cada pestaña con las tareas correspondientes
+    for i, tab in enumerate(tabs):
+        dia_actual = dias[i]
+        with tab:
+            st.subheader(f"📅 Planilla del {dia_actual}")
+            
+            # Dividir en dos columnas para Gonzalo y Lucas
+            col_gonza, col_lucas = st.columns(2)
+            
+            # --- Tareas de Gonzalo ---
+            with col_gonza:
+                st.markdown("### 👨‍💻 Gonzalo")
+                
+                # Turno Mañana
+                st.info("**Mañana (09:00 - 13:30)**")
+                for tarea in agenda[dia_actual]["Gonzalo"]["09:00 - 13:30"]:
+                    st.checkbox(tarea, key=f"G_M_{dia_actual}_{tarea}")
+                
+                # Turno Tarde
+                st.warning("**Tarde (13:30 - 18:00)**")
+                for tarea in agenda[dia_actual]["Gonzalo"]["13:30 - 18:00"]:
+                    st.checkbox(tarea, key=f"G_T_{dia_actual}_{tarea}")
+
+            # --- Tareas de Lucas ---
+            with col_lucas:
+                st.markdown("### 👨‍💻 Lucas")
+                
+                # Turno Mañana
+                st.info("**Mañana (09:00 - 13:30)**")
+                for tarea in agenda[dia_actual]["Lucas"]["09:00 - 13:30"]:
+                    st.checkbox(tarea, key=f"L_M_{dia_actual}_{tarea}")
+                
+                # Turno Tarde
+                st.warning("**Tarde (13:30 - 18:00)**")
+                for tarea in agenda[dia_actual]["Lucas"]["13:30 - 18:00"]:
+                    st.checkbox(tarea, key=f"L_T_{dia_actual}_{tarea}")
+
+# ==========================================
+# --- VISTA 2: CARGAR RECLAMO ---
+# ==========================================
+elif opcion == "📄 Cargar Reclamo":
     st.title("📄 Cargar / Actualizar Reclamo")
     
     with st.form("formulario_reclamos"):
@@ -93,7 +204,7 @@ if opcion == "📄 Cargar Reclamo":
             st.success("✅ ¡Guardado con éxito! (Nota: Ve a 'Historial' para ver el reclamo cargado).")
 
 # ==========================================
-# --- VISTA 2: CARGAR ENVÍO ERRÓNEO ---
+# --- VISTA 3: CARGAR ENVÍO ERRÓNEO ---
 # ==========================================
 elif opcion == "📦 Cargar Envío Erróneo":
     st.title("📦 Cargar Envío Erróneo")
@@ -121,14 +232,13 @@ elif opcion == "📦 Cargar Envío Erróneo":
         if nro_venta == "" or sku == "":
             st.error("⚠️ Por favor completa al menos el NRO VENTA y el SKU.")
         else:
-            # Estructura idéntica a la de la captura de pantalla: 
-            # Agente | Canal | Tienda | NRO VENTA | SKU | Afectó Rep | Comentarios
+            # Estructura idéntica a la de la captura de pantalla
             nueva_fila_envio = [agente, canal, tienda, nro_venta, sku, afecto_rep, comentarios]
             hoja_envios.append_row(nueva_fila_envio)
             st.success("✅ ¡Envío erróneo guardado con éxito!")
 
 # ==========================================
-# --- VISTA 3: RESUMEN DIARIO ---
+# --- VISTA 4: RESUMEN DIARIO ---
 # ==========================================
 elif opcion == "📊 Resumen Diario":
     st.title("📊 Resumen de Operaciones de Hoy")
@@ -156,7 +266,7 @@ elif opcion == "📊 Resumen Diario":
         st.metric(label="🔥 PENDIENTES TOTALES:", value=pendientes_actuales)
 
 # ==========================================
-# --- VISTA 4: HISTORIAL COMPLETO ---
+# --- VISTA 5: HISTORIAL COMPLETO ---
 # ==========================================
 elif opcion == "🗂️ Historial Completo":
     st.title("🗂️ Historial de Reclamos")
@@ -166,3 +276,6 @@ elif opcion == "🗂️ Historial Completo":
         st.dataframe(df, use_container_width=True, hide_index=True)
     else:
         st.info("Aún no hay registros en la base de datos.")
+```eof
+
+He creado la agenda utilizando un diccionario estructurado, lo cual hace que el código sea muy fácil de leer y, si en el futuro necesitas cambiar alguna tarea o turno, solo debes modificar ese bloque de texto. Utilicé colores informativos sutiles (`st.info` y `st.warning`) para ayudar a distinguir visualmente entre los turnos de la mañana y de la tarde. ¡Pruébalo y me dices cómo funciona!
