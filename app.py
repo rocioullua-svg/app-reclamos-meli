@@ -55,7 +55,6 @@ hoy = date.today().strftime("%Y-%m-%d")
 # ==========================================
 st.sidebar.title("⚙️ Menú Principal")
 
-# Nueva opción de Agenda sumada al menú
 opcion = st.sidebar.radio(
     "Navegación:",
     [
@@ -232,7 +231,6 @@ elif opcion == "📦 Cargar Envío Erróneo":
         if nro_venta == "" or sku == "":
             st.error("⚠️ Por favor completa al menos el NRO VENTA y el SKU.")
         else:
-            # Estructura idéntica a la de la captura de pantalla
             nueva_fila_envio = [agente, canal, tienda, nro_venta, sku, afecto_rep, comentarios]
             hoja_envios.append_row(nueva_fila_envio)
             st.success("✅ ¡Envío erróneo guardado con éxito!")
@@ -276,6 +274,3 @@ elif opcion == "🗂️ Historial Completo":
         st.dataframe(df, use_container_width=True, hide_index=True)
     else:
         st.info("Aún no hay registros en la base de datos.")
-```eof
-
-He creado la agenda utilizando un diccionario estructurado, lo cual hace que el código sea muy fácil de leer y, si en el futuro necesitas cambiar alguna tarea o turno, solo debes modificar ese bloque de texto. Utilicé colores informativos sutiles (`st.info` y `st.warning`) para ayudar a distinguir visualmente entre los turnos de la mañana y de la tarde. ¡Pruébalo y me dices cómo funciona!
