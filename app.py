@@ -7,14 +7,21 @@ import json
 # --- CONFIGURACIÓN Y ESTILOS ---
 st.set_page_config(page_title="Gestión de Reclamos", page_icon="📦", layout="wide", initial_sidebar_state="expanded")
 
-# Inyección de CSS: Estilo Claro (CRM / Bandeja de entrada)
+# Inyección de CSS: Estilo Claro (CRM) y Fuente Inter
 st.markdown("""
     <style>
+    /* Importar fuente Inter desde Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+    /* Aplicar fuente a toda la aplicación */
+    html, body, [class*="css"], .stApp, p, span, div, h1, h2, h3, h4, h5, h6, label, input, button, textarea, select {
+        font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+    }
+
     /* Fondo principal y tipografía */
     .stApp {
         background-color: #f4f5f7;
         color: #202124;
-        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
     
     /* Barra lateral */
@@ -322,6 +329,10 @@ elif opcion == "📊 Resumen Diario":
 elif opcion == "🗂️ Historial Completo":
     st.title("🗂️ Historial Completo")
     
+    if not df.empty:
+        st.dataframe(df, use_container_width=True, hide_index=True)
+    else:
+        st.info("Aún no hay registros en la base de datos.")
     if not df.empty:
         st.dataframe(df, use_container_width=True, hide_index=True)
     else:
