@@ -5,24 +5,85 @@ import gspread
 import json
 
 # --- CONFIGURACIÓN Y ESTILOS ---
-st.set_page_config(page_title="Gestión de Reclamos ML", page_icon="📦", layout="wide")
+st.set_page_config(page_title="Gestión de Reclamos", page_icon="✨", layout="wide", initial_sidebar_state="expanded")
 
+# Inyección de CSS estilo "Gemini / Material You"
 st.markdown("""
     <style>
-    div.stButton > button:first-child {
-        background-color: #ffe600; 
-        color: #2d3277; 
-        border-radius: 8px;
-        border: none;
-        font-weight: bold;
+    /* Fondo principal y tipografía */
+    .stApp {
+        background-color: #131314;
+        color: #e3e3e3;
+        font-family: 'Google Sans', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    /* Barra lateral */
+    [data-testid="stSidebar"] {
+        background-color: #1e1f20 !important;
+        border-right: 1px solid #444746 !important;
+    }
+    
+    /* Estilo de los Inputs (Texto, Select, Textarea) */
+    div[data-baseweb="input"] > div, 
+    div[data-baseweb="select"] > div, 
+    div[data-baseweb="textarea"] > div {
+        background-color: #1e1f20 !important;
+        border-radius: 12px !important;
+        border: 1px solid #444746 !important;
+        color: white !important;
+        padding: 2px 8px;
+        transition: border-color 0.3s ease;
+    }
+    
+    /* Efecto Focus en los Inputs */
+    div[data-baseweb="input"] > div:focus-within, 
+    div[data-baseweb="select"] > div:focus-within, 
+    div[data-baseweb="textarea"] > div:focus-within {
+        border-color: #a8c7fa !important;
+        box-shadow: none !important;
+    }
+    
+    /* Contenedor del Formulario */
+    [data-testid="stForm"] {
+        background-color: #1e1f20;
+        border: 1px solid #333638;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Botón Principal estilo "Prompt" */
+    div.stButton > button {
+        background: linear-gradient(90deg, #a8c7fa 0%, #8ab4f8 100%) !important;
+        color: #041e49 !important;
+        border-radius: 24px !important;
+        border: none !important;
+        padding: 10px 24px !important;
+        font-weight: 600 !important;
+        font-size: 15px !important;
+        transition: all 0.3s ease !important;
         width: 100%;
+        margin-top: 15px;
     }
-    div.stButton > button:first-child:hover {
-        background-color: #2d3277;
-        color: #ffe600;
+    
+    div.stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(138, 180, 248, 0.25) !important;
+        background: linear-gradient(90deg, #b9d4ff 0%, #a8c7fa 100%) !important;
     }
+    
+    /* Estilo de los Checkboxes de la Agenda */
     .stCheckbox label {
         font-size: 15px !important;
+        color: #e3e3e3 !important;
+    }
+    
+    /* Tarjetas de Métricas (Resumen Diario) */
+    [data-testid="metric-container"] {
+        background-color: #1e1f20;
+        border: 1px solid #444746;
+        border-radius: 16px;
+        padding: 15px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -36,7 +97,6 @@ def conectar_sheets():
     
     hoja_principal = planilla.sheet1
     
-    # Intentamos conectar a una pestaña específica para los envíos erróneos
     try:
         hoja_envios = planilla.worksheet("Envios_Erroneos")
     except:
@@ -53,7 +113,7 @@ hoy = date.today().strftime("%Y-%m-%d")
 # ==========================================
 # --- MENÚ LATERAL (SIDEBAR) ---
 # ==========================================
-st.sidebar.title("⚙️ Menú Principal")
+st.sidebar.title("✨ Menú Principal")
 
 opcion = st.sidebar.radio(
     "Navegación:",
@@ -67,16 +127,15 @@ opcion = st.sidebar.radio(
 )
 
 st.sidebar.divider()
-st.sidebar.caption("Aplicación conectada a Google Sheets")
+st.sidebar.caption("Sincronizado con Google Sheets")
 
 # ==========================================
 # --- VISTA 1: AGENDA DE TAREAS ---
 # ==========================================
 if opcion == "🗓️ Agenda de Tareas":
-    st.title("🗓️ Agenda Semanal de Tareas")
+    st.title("🗓️ Agenda Semanal")
     st.markdown("Organización de turnos y responsabilidades de Atención al Cliente.")
     
-    # Estructura de la agenda extraída del Excel
     agenda = {
         "Lunes": {
             "Gonzalo": {
@@ -130,43 +189,32 @@ if opcion == "🗓️ Agenda de Tareas":
         }
     }
 
-    # Crear pestañas para los días de la semana
     dias = list(agenda.keys())
     tabs = st.tabs(dias)
 
-    # Llenar cada pestaña con las tareas correspondientes
     for i, tab in enumerate(tabs):
         dia_actual = dias[i]
         with tab:
-            st.subheader(f"📅 Planilla del {dia_actual}")
+            st.write(f"### 📅 Planilla del {dia_actual}")
             
-            # Dividir en dos columnas para Gonzalo y Lucas
             col_gonza, col_lucas = st.columns(2)
             
-            # --- Tareas de Gonzalo ---
             with col_gonza:
-                st.markdown("### 👨‍💻 Gonzalo")
-                
-                # Turno Mañana
+                st.markdown("#### 👨‍💻 Gonzalo")
                 st.info("**Mañana (09:00 - 13:30)**")
                 for tarea in agenda[dia_actual]["Gonzalo"]["09:00 - 13:30"]:
                     st.checkbox(tarea, key=f"G_M_{dia_actual}_{tarea}")
                 
-                # Turno Tarde
                 st.warning("**Tarde (13:30 - 18:00)**")
                 for tarea in agenda[dia_actual]["Gonzalo"]["13:30 - 18:00"]:
                     st.checkbox(tarea, key=f"G_T_{dia_actual}_{tarea}")
 
-            # --- Tareas de Lucas ---
             with col_lucas:
-                st.markdown("### 👨‍💻 Lucas")
-                
-                # Turno Mañana
+                st.markdown("#### 👨‍💻 Lucas")
                 st.info("**Mañana (09:00 - 13:30)**")
                 for tarea in agenda[dia_actual]["Lucas"]["09:00 - 13:30"]:
                     st.checkbox(tarea, key=f"L_M_{dia_actual}_{tarea}")
                 
-                # Turno Tarde
                 st.warning("**Tarde (13:30 - 18:00)**")
                 for tarea in agenda[dia_actual]["Lucas"]["13:30 - 18:00"]:
                     st.checkbox(tarea, key=f"L_T_{dia_actual}_{tarea}")
@@ -175,7 +223,7 @@ if opcion == "🗓️ Agenda de Tareas":
 # --- VISTA 2: CARGAR RECLAMO ---
 # ==========================================
 elif opcion == "📄 Cargar Reclamo":
-    st.title("📄 Cargar / Actualizar Reclamo")
+    st.title("📄 Cargar Reclamo")
     
     with st.form("formulario_reclamos"):
         col1, col2 = st.columns(2)
@@ -200,14 +248,14 @@ elif opcion == "📄 Cargar Reclamo":
             fecha_res = hoy if estado == "Resuelto" else ""
             nueva_fila = [hoy, id_venta, sku, categoria, motivo, responsabilidad, estado, "Sí", agente, fecha_res]
             hoja.append_row(nueva_fila)
-            st.success("✅ ¡Guardado con éxito! (Nota: Ve a 'Historial' para ver el reclamo cargado).")
+            st.success("✅ ¡Guardado con éxito!")
 
 # ==========================================
 # --- VISTA 3: CARGAR ENVÍO ERRÓNEO ---
 # ==========================================
 elif opcion == "📦 Cargar Envío Erróneo":
     st.title("📦 Cargar Envío Erróneo")
-    st.markdown("Registro de productos cruzados o mal enviados según el formato operativo.")
+    st.markdown("Registro de productos cruzados o mal enviados.")
     
     with st.form("formulario_envios_erroneos"):
         col1, col2, col3 = st.columns(3)
@@ -239,7 +287,7 @@ elif opcion == "📦 Cargar Envío Erróneo":
 # --- VISTA 4: RESUMEN DIARIO ---
 # ==========================================
 elif opcion == "📊 Resumen Diario":
-    st.title("📊 Resumen de Operaciones de Hoy")
+    st.title("📊 Resumen de Operaciones")
     
     empezamos_dia, nuevos_hoy, resueltos_hoy, pendientes_actuales = 0, 0, 0, 0
     
@@ -255,20 +303,19 @@ elif opcion == "📊 Resumen Diario":
         
     col_a, col_b, col_c, col_d = st.columns(4)
     with col_a:
-        st.metric(label="Arrancamos con:", value=empezamos_dia)
+        st.metric(label="Arrancamos con", value=empezamos_dia)
     with col_b:
-        st.metric(label="⚠️ Entraron hoy:", value=nuevos_hoy)
+        st.metric(label="⚠️ Entraron hoy", value=nuevos_hoy)
     with col_c:
-        st.metric(label="✅ Resueltos hoy:", value=resueltos_hoy)
+        st.metric(label="✅ Resueltos hoy", value=resueltos_hoy)
     with col_d:
-        st.metric(label="🔥 PENDIENTES TOTALES:", value=pendientes_actuales)
+        st.metric(label="🔥 PENDIENTES", value=pendientes_actuales)
 
 # ==========================================
 # --- VISTA 5: HISTORIAL COMPLETO ---
 # ==========================================
 elif opcion == "🗂️ Historial Completo":
-    st.title("🗂️ Historial de Reclamos")
-    st.markdown("Aquí puedes visualizar toda tu base de datos tal cual está en Excel.")
+    st.title("🗂️ Historial Completo")
     
     if not df.empty:
         st.dataframe(df, use_container_width=True, hide_index=True)
