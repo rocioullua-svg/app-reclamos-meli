@@ -109,9 +109,15 @@ def conectar_sheets():
     
     hoja_principal = planilla.sheet1
     
+    # Intentamos conectar a la pestaña "Envios_Erroneos". 
+    # Si no existe, la crea automáticamente con sus encabezados.
     try:
         hoja_envios = planilla.worksheet("Envios_Erroneos")
-    except:
+    except gspread.exceptions.WorksheetNotFound:
+        hoja_envios = planilla.add_worksheet(title="Envios_Erroneos", rows="1000", cols="10")
+        hoja_envios.append_row(["Agente", "Canal", "Tienda", "NRO VENTA", "SKU", "Afectó Rep", "Comentarios"])
+    except Exception:
+        # Falla de seguridad por si ocurre otro tipo de error
         hoja_envios = hoja_principal
         
     return hoja_principal, hoja_envios
@@ -131,8 +137,8 @@ opcion = st.sidebar.radio(
     "Navegación:",
     [
         "🗓️ Agenda de Tareas",
-        "📦 Cargar Envío Erróneo",
         "📄 Cargar Reclamo", 
+        "📦 Cargar Envío Erróneo", 
         "📊 Resumen Diario", 
         "🗂️ Historial Completo"
     ]
@@ -291,9 +297,10 @@ elif opcion == "📦 Cargar Envío Erróneo":
         if nro_venta == "" or sku == "":
             st.error("⚠️ Por favor completa al menos el NRO VENTA y el SKU.")
         else:
+            # Esta fila se manda directo a la hoja "Envios_Erroneos"
             nueva_fila_envio = [agente, canal, tienda, nro_venta, sku, afecto_rep, comentarios]
             hoja_envios.append_row(nueva_fila_envio)
-            st.success("✅ ¡Envío erróneo guardado con éxito!")
+            st.success("✅ ¡Envío erróneo guardado con éxito en su propia pestaña!")
 
 # ==========================================
 # --- VISTA 4: RESUMEN DIARIO ---
@@ -329,10 +336,6 @@ elif opcion == "📊 Resumen Diario":
 elif opcion == "🗂️ Historial Completo":
     st.title("🗂️ Historial Completo")
     
-    if not df.empty:
-        st.dataframe(df, use_container_width=True, hide_index=True)
-    else:
-        st.info("Aún no hay registros en la base de datos.")
     if not df.empty:
         st.dataframe(df, use_container_width=True, hide_index=True)
     else:
