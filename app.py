@@ -162,8 +162,14 @@ def conectar_sheets():
     return hoja_principal, hoja_envios
 
 hoja, hoja_envios = conectar_sheets()
-datos = hoja.get_all_records()
-df = pd.DataFrame(datos)
+
+# Cargar DataFrames
+datos_reclamos = hoja.get_all_records()
+df = pd.DataFrame(datos_reclamos)
+
+datos_envios = hoja_envios.get_all_records()
+df_envios = pd.DataFrame(datos_envios)
+
 hoy = date.today().strftime("%Y-%m-%d")
 
 # ==========================================
@@ -237,7 +243,7 @@ if opcion == "🗓️ Agenda de Tareas":
                 for tarea in agenda[dia_actual]["Lucas"]["13:30 - 18:00"]: st.checkbox(tarea, key=f"L_T_{dia_actual}_{tarea}")
 
 # ==========================================
-# --- VISTA 2: ENTREGAS Y RETIROS (NUEVO) ---
+# --- VISTA 2: ENTREGAS Y RETIROS ---
 # ==========================================
 elif opcion == "🚚 Entregas y Retiros":
     st.title("🚚 Procesador de Entregas / Retiros")
@@ -362,6 +368,8 @@ elif opcion == "📄 Cargar Reclamo":
     if submit:
         if id_venta == "" or sku == "":
             st.error("⚠️ Por favor completa al menos el ID de Venta y el SKU.")
+        elif not df.empty and str(id_venta) in df.astype(str).values:
+            st.error("❌ Este ID de Venta ya se encuentra registrado en la base de reclamos.")
         else:
             fecha_res = hoy if estado == "Resuelto" else ""
             nueva_fila = [hoy, id_venta, sku, categoria, motivo, responsabilidad, estado, "Sí", agente, fecha_res]
@@ -393,6 +401,8 @@ elif opcion == "📦 Cargar Envío Erróneo":
     if submit_envio:
         if nro_venta == "" or sku == "":
             st.error("⚠️ Por favor completa al menos el NRO VENTA y el SKU.")
+        elif not df_envios.empty and str(nro_venta) in df_envios.astype(str).values:
+            st.error("❌ Este NRO VENTA ya se encuentra registrado en la base de Envíos Erróneos.")
         else:
             nueva_fila_envio = [agente, canal, tienda, nro_venta, sku, afecto_rep, comentarios]
             hoja_envios.append_row(nueva_fila_envio)
@@ -426,7 +436,18 @@ elif opcion == "📊 Resumen Diario":
 # ==========================================
 elif opcion == "🗂️ Historial Completo":
     st.title("🗂️ Historial Completo")
-    if not df.empty:
-        st.dataframe(df, use_container_width=True, hide_index=True)
-    else:
-        st.info("Aún no hay registros en la base de datos.")
+    
+    # Sistema de pestañas para dividir los historiales
+    tab1, tab2 = st.tabs(["📄 Base de Reclamos", "📦 Base de Envíos Erróneos"])
+    
+    with tab1:
+        if not df.empty:
+            st.dataframe(df, use_container_width=True, hide_index=True)
+        else:
+            st.info("Aún no hay registros en la base de datos de Reclamos.")
+            
+    with tab2:
+        if not df_envios.empty:
+            st.dataframe(df_envios, use_container_width=True, hide_index=True)
+        else:
+            st.info("Aún no hay registros en la base de datos de Envíos Erróneos.")
