@@ -131,8 +131,8 @@ opcion = st.sidebar.radio(
     "Navegación:",
     [
         "🗓️ Agenda de Tareas",
+        "📦 Cargar Envío Erróneo",
         "📄 Cargar Reclamo", 
-        "📦 Cargar Envío Erróneo", 
         "📊 Resumen Diario", 
         "🗂️ Historial Completo"
     ]
