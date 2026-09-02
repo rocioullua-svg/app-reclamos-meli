@@ -12,7 +12,7 @@ import io
 # ==========================================
 st.set_page_config(page_title="Gestión Operativa", page_icon="📦", layout="wide", initial_sidebar_state="expanded")
 
-# Inyección de CSS: Estilo Claro (CRM) y Fuente Inter
+# Inyección de CSS: Estilo Oscuro (Dark Theme) y Fuente Inter
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
@@ -21,64 +21,80 @@ st.markdown("""
         font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
     }
 
-    .stApp { background-color: #f4f5f7; color: #202124; }
+    /* Fondo principal y tipografía general */
+    .stApp { background-color: #131314; color: #e3e3e3; }
     
+    /* Barra lateral */
     [data-testid="stSidebar"] {
-        background-color: #ffffff !important;
-        border-right: 1px solid #e0e0e0 !important;
+        background-color: #1e1f20 !important;
+        border-right: 1px solid #444746 !important;
     }
     
+    /* Contenedores (Formularios y Tarjetas de Métricas) */
     [data-testid="stForm"], [data-testid="metric-container"] {
-        background-color: #ffffff;
-        border: 1px solid #e0e0e0;
+        background-color: #1e1f20;
+        border: 1px solid #333638;
         border-radius: 12px;
         padding: 24px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     }
     
+    /* Estilo de los Inputs (Texto, Select, Textarea) - Corrección de visibilidad al escribir */
     div[data-baseweb="input"] > div, 
     div[data-baseweb="select"] > div, 
     div[data-baseweb="textarea"] > div {
-        background-color: #f9f9f9 !important;
+        background-color: #131314 !important;
         border-radius: 20px !important;
-        border: 1px solid #dcdcdc !important;
-        color: #202124 !important;
+        border: 1px solid #444746 !important;
+        color: #e3e3e3 !important; /* Color del texto al escribir */
         padding: 2px 12px;
-        transition: border-color 0.2s ease;
+        transition: border-color 0.3s ease;
     }
     
+    /* Asegurar que el texto dentro del input sea blanco/gris claro */
+    input, textarea, div[data-baseweb="select"] {
+        color: #e3e3e3 !important;
+    }
+    
+    /* Efecto Focus en los Inputs */
     div[data-baseweb="input"] > div:focus-within, 
     div[data-baseweb="select"] > div:focus-within, 
     div[data-baseweb="textarea"] > div:focus-within {
-        border-color: #2563eb !important;
-        background-color: #ffffff !important;
+        border-color: #a8c7fa !important;
+        background-color: #1e1f20 !important;
         box-shadow: none !important;
     }
     
+    /* Botón Principal */
     div.stButton > button {
-        background-color: #2563eb !important;
-        color: white !important;
+        background: linear-gradient(90deg, #a8c7fa 0%, #8ab4f8 100%) !important;
+        color: #041e49 !important;
         border-radius: 24px !important;
         border: none !important;
         padding: 10px 24px !important;
         font-weight: 600 !important;
         font-size: 14px !important;
-        transition: all 0.2s ease !important;
+        transition: all 0.3s ease !important;
         width: 100%;
         margin-top: 15px;
     }
     
     div.stButton > button:hover {
-        background-color: #1d4ed8 !important;
-        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2) !important;
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(138, 180, 248, 0.25) !important;
+        background: linear-gradient(90deg, #b9d4ff 0%, #a8c7fa 100%) !important;
     }
     
-    .stCheckbox label { font-size: 14px !important; color: #202124 !important; }
-    h1, h2, h3, p, label { color: #202124 !important; }
+    /* Checkboxes y textos fijos */
+    .stCheckbox label { font-size: 14px !important; color: #e3e3e3 !important; }
+    h1, h2, h3, p, label { color: #e3e3e3 !important; }
     
-    button[data-baseweb="tab"] { color: #5f6368 !important; }
-    button[aria-selected="true"] { color: #2563eb !important; font-weight: 600 !important; }
+    /* Estilo de las Pestañas (Tabs) */
+    button[data-baseweb="tab"] { color: #9aa0a6 !important; }
+    button[aria-selected="true"] { 
+        color: #a8c7fa !important; 
+        font-weight: 600 !important; 
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -247,7 +263,7 @@ if opcion == "🗓️ Agenda de Tareas":
 # ==========================================
 elif opcion == "🚚 Entregas y Retiros":
     st.title("🚚 Procesador de Entregas / Retiros")
-    st.markdown("Gestión conectada a YiQi ERP y cuentas de Mercado Libre[cite: 2].")
+    st.markdown("Gestión conectada a YiQi ERP y cuentas de Mercado Libre.")
     
     st.write("#### 1. Buscar Operación")
     cuenta_seleccionada = st.selectbox("Selecciona la cuenta de Mercado Libre correspondiente a la venta:", list(CUENTAS_ML.keys()))
