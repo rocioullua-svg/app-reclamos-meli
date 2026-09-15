@@ -403,7 +403,7 @@ elif opcion == "📦 Cargar Envío Erróneo":
         col1, col2, col3 = st.columns(3)
         with col1:
             agente = st.text_input("Agente:")
-            canal = st.selectbox("Canal:", ["MELI", "FLEX", "FULL", "WEB"])
+            canal = st.selectbox("Canal:", ["MELI", "FLEX", "FULL", "WEB","FVG"])
             tienda = st.text_input("Tienda:", value="G24HS")
         with col2:
             nro_venta = st.text_input("NRO VENTA:")
