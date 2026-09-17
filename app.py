@@ -99,6 +99,20 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
+# --- ESTADO GLOBAL COMPARTIDO PARA AGENDA ---
+# ==========================================
+@st.cache_resource
+def obtener_estado_agenda():
+    # Este diccionario se comparte entre todos los usuarios conectados
+    return {}
+
+estado_global_agenda = obtener_estado_agenda()
+
+def actualizar_tarea(key):
+    # Al hacer click, guardamos el estado del checkbox en la memoria global
+    estado_global_agenda[key] = st.session_state[key]
+
+# ==========================================
 # --- CREDENCIALES Y FUNCIONES DE APIS ---
 # ==========================================
 CUENTAS_ML = {
@@ -212,7 +226,14 @@ st.sidebar.caption("Sincronizado con G-Sheets, ML y YiQi")
 # --- VISTA 1: AGENDA DE TAREAS ---
 # ==========================================
 if opcion == "🗓️ Agenda de Tareas":
-    st.title("🗓️ Agenda Semanal")
+    col_titulo, col_boton = st.columns([4, 1])
+    with col_titulo:
+        st.title("🗓️ Agenda Semanal")
+    with col_boton:
+        st.write("") # Espaciado
+        # Este botón permite a un usuario recargar la pantalla para ver qué tildó su compañero
+        st.button("🔄 Actualizar vista", use_container_width=True)
+
     st.markdown("Organización de turnos y responsabilidades de Atención al Cliente.")
     
     agenda = {
@@ -248,15 +269,23 @@ if opcion == "🗓️ Agenda de Tareas":
             with col_gonza:
                 st.markdown("#### 👨‍💻 Gonzalo")
                 st.info("**Mañana (09:00 - 13:30)**")
-                for tarea in agenda[dia_actual]["Gonzalo"]["09:00 - 13:30"]: st.checkbox(tarea, key=f"G_M_{dia_actual}_{tarea}")
+                for tarea in agenda[dia_actual]["Gonzalo"]["09:00 - 13:30"]: 
+                    chk_key = f"G_M_{dia_actual}_{tarea}"
+                    st.checkbox(tarea, key=chk_key, value=estado_global_agenda.get(chk_key, False), on_change=actualizar_tarea, args=(chk_key,))
                 st.warning("**Tarde (13:30 - 18:00)**")
-                for tarea in agenda[dia_actual]["Gonzalo"]["13:30 - 18:00"]: st.checkbox(tarea, key=f"G_T_{dia_actual}_{tarea}")
+                for tarea in agenda[dia_actual]["Gonzalo"]["13:30 - 18:00"]: 
+                    chk_key = f"G_T_{dia_actual}_{tarea}"
+                    st.checkbox(tarea, key=chk_key, value=estado_global_agenda.get(chk_key, False), on_change=actualizar_tarea, args=(chk_key,))
             with col_lucas:
                 st.markdown("#### 👨‍💻 Lucas")
                 st.info("**Mañana (09:00 - 13:30)**")
-                for tarea in agenda[dia_actual]["Lucas"]["09:00 - 13:30"]: st.checkbox(tarea, key=f"L_M_{dia_actual}_{tarea}")
+                for tarea in agenda[dia_actual]["Lucas"]["09:00 - 13:30"]: 
+                    chk_key = f"L_M_{dia_actual}_{tarea}"
+                    st.checkbox(tarea, key=chk_key, value=estado_global_agenda.get(chk_key, False), on_change=actualizar_tarea, args=(chk_key,))
                 st.warning("**Tarde (13:30 - 18:00)**")
-                for tarea in agenda[dia_actual]["Lucas"]["13:30 - 18:00"]: st.checkbox(tarea, key=f"L_T_{dia_actual}_{tarea}")
+                for tarea in agenda[dia_actual]["Lucas"]["13:30 - 18:00"]: 
+                    chk_key = f"L_T_{dia_actual}_{tarea}"
+                    st.checkbox(tarea, key=chk_key, value=estado_global_agenda.get(chk_key, False), on_change=actualizar_tarea, args=(chk_key,))
 
 # ==========================================
 # --- VISTA 2: ENTREGAS Y RETIROS ---
